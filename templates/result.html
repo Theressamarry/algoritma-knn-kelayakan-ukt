@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil KNN{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- hasil prediksi -->
+            <div class="result-card {{ 'success-result' if result.prediction_value == 1 else 'danger-result' }}">
+                <div class="text-center">
+                    <h2 class="mb-3">{{ result.prediction }}</h2>
+                    <p class="lead">
+                        {% if result.prediction_value == 1 %}
+                            Berdasarkan analisis KNN, mahasiswa <strong>layak</strong> mendapatkan keringanan UKT.
+                        {% else %}
+                            Berdasarkan analisis KNN, mahasiswa <strong>tidak layak</strong> mendapatkan keringanan UKT.
+                        {% endif %}
+                    </p>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: {{ result.confidence_value * 100 }}%"></div>
+                    </div>
+                    <p class="mb-0">Confidence Score: <strong>{{ result.confidence }}</strong></p>
+                </div>
+            </div>
+
+            <!-- ringkasan data input user -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Data Input
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Status Tempat Tinggal:</strong> {{ result.input_data.tempat_tinggal }}</p>
+                            <p><strong>Pekerjaan Orang Tua:</strong> {{ result.input_data.pekerjaan }}</p>
+                            <p><strong>Penghasilan per Bulan:</strong> {{ result.input_data.penghasilan }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Jumlah Tanggungan:</strong> {{ result.input_data.tanggungan }} orang</p>
+                            <p><strong>Jumlah Kendaraan:</strong> {{ result.input_data.kendaraan }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- detail k-nearest neigboards -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-users me-2"></i>Detail K-Nearest Neighbors
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        Berikut adalah 5 data terdekat yang digunakan untuk prediksi berdasarkan jarak Euclidean:
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Ranking</th>
+                                    <th>Jarak Euclidean</th>
+                                    <th>Label</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for neighbor in result.k_nearest_neighbors %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ neighbor.distance }}</td>
+                                    <td>
+                                        <span class="badge {{ 'bg-success' if neighbor.label_value == 1 else 'bg-danger' }}">
+                                            {{ neighbor.label }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <i class="fas {{ 'fa-check text-success' if neighbor.label_value == 1 else 'fa-times text-danger' }}"></i>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- navigasi tambahan -->
+            <div class="text-center">
+                <a href="{{ url_for('index') }}" class="btn btn-primary me-3">
+                    <i class="fas fa-redo me-2"></i>Prediksi Lagi
+                </a>
+                <a href="{{ url_for('dataset') }}" class="btn btn-outline-primary me-3">
+                    <i class="fas fa-database me-2"></i>Lihat Dataset
+                </a>
+                <a href="{{ url_for('about') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-info-circle me-2"></i>Tentang KNN
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Tentang{% endblock %}
+
+{% block content %}
+<div class="container text-center my-5">
+    <h2 class="mb-5 fw-bold" style="color: var(--primary-color);">Kelompok 6</h2>
+    
+    <div class="row justify-content-center">
+        <!-- Card 1 -->
+        <div class="col-md-4 mb-4">
+            <div class="card p-4">
+                <img src="{{ url_for('static', filename='image/mc1.jpg') }}" class="card-img-top rounded-circle mx-auto d-block" alt="Foto 1" style="width: 150px; height: 150px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Theressa Marry Christianty</h5>
+                    <p class="card-text">NPM: 23081010131</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="col-md-4 mb-4">
+            <div class="card p-4">
+                <img src="{{ url_for('static', filename='image/mc2.jpeg') }}" class="card-img-top rounded-circle mx-auto d-block" alt="Foto 2" style="width: 150px; height: 150px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Muhaamad Zainal Ilmi</h5>
+                    <p class="card-text">NPM: 23081010072</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Index{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-graduation-cap me-3"></i>
+                    Prediksi Kelayakan Keringanan UKT
+                </h1>
+                <p class="lead mb-4">
+                    Sistem prediksi menggunakan algoritma K-Nearest Neighbors (KNN) untuk menentukan kelayakan mahasiswa mendapatkan keringan UKT.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <!-- form untuk input user -->
+    <div id="prediction-form" class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header text-center bg-transparent">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-user-graduate me-2"></i>Form Prediksi Keringanan UKT
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('predict') }}" onsubmit="showLoading(document.querySelector('.btn-submit'))">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tempat_tinggal" class="form-label">
+                                    <i class="fas fa-home me-2"></i>Status Tempat Tinggal
+                                </label>
+                                <select class="form-select" id="tempat_tinggal" name="tempat_tinggal" required>
+                                    <option value="">Pilih Status Tempat Tinggal</option>
+                                    <option value="Punya">Punya Rumah Sendiri</option>
+                                    <option value="Tidak Punya">Tidak Punya/Sewa/Kontrak</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="pekerjaan" class="form-label">
+                                    <i class="fas fa-briefcase me-2"></i>Pekerjaan Orang Tua
+                                </label>
+                                <select class="form-select" id="pekerjaan" name="pekerjaan" required>
+                                    <option value="">Pilih Pekerjaan</option>
+                                    <option value="PNS">PNS</option>
+                                    <option value="TNI/POLRI">TNI/POLRI</option>
+                                    <option value="Guru">Guru</option>
+                                    <option value="Buruh">Buruh</option>
+                                    <option value="Petani">Petani</option>
+                                    <option value="Nelayan">Nelayan</option>
+                                    <option value="Wiraswasta">Wiraswasta</option>
+                                    <option value="Ibu Rumah Tangga">Ibu Rumah Tangga</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="penghasilan" class="form-label">
+                                    <i class="fas fa-money-bill me-2"></i>Penghasilan Orang Tua per Bulan
+                                </label>
+                                <input type="text" class="form-control" id="penghasilan" name="penghasilan" 
+                                       placeholder="Contoh: 5000000" oninput="formatCurrency(this)" required>
+                                <div class="form-text">Masukkan dalam Rupiah (tanpa titik atau koma)</div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="tanggungan" class="form-label">
+                                    <i class="fas fa-users me-2"></i>Jumlah Tanggungan Keluarga
+                                </label>
+                                <select class="form-select" id="tanggungan" name="tanggungan" required>
+                                    <option value="">Pilih Jumlah Tanggungan</option>
+                                    <option value="1">1 orang</option>
+                                    <option value="2">2 orang</option>
+                                    <option value="3">3 orang</option>
+                                    <option value="4">4 orang</option>
+                                    <option value="5">5 orang</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="kendaraan" class="form-label">
+                                <i class="fas fa-car me-2"></i>Jumlah Kendaraan yang Dimiliki
+                            </label>
+                            <select class="form-select" id="kendaraan" name="kendaraan" required>
+                                <option value="">Pilih Jumlah Kendaraan</option>
+                                <option value="0">Tidak ada kendaraan</option>
+                                <option value="1">1 kendaraan</option>
+                                <option value="2">2 kendaraan</option>
+                            </select>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg btn-submit">
+                                <i class="fas fa-magic me-2"></i>Prediksi Kelayakan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // format input penghsilan dalam rupiah
+    function formatCurrency(input) {
+        // hpus semua chara kecuali angka
+        let value = input.value.replace(/\D/g, '');
+        if (value) {
+            // store nilai asli tanpa format rupiah
+            input.setAttribute('data-value', value);
+            // format angka tiga angka dibelakang titik
+            value = new Intl.NumberFormat('id-ID').format(value);
+            // show hasil input
+            input.value = value;
+        }
+    }
+
+    // sebelum submit, gantiinpu penghsilan tanpa format rupiah
+    document.querySelector('form').addEventListener('submit', function() {
+        const penghasilanInput = document.getElementById('penghasilan');
+        const rawValue = penghasilanInput.getAttribute('data-value');
+        if (rawValue) {
+            penghasilanInput.value = rawValue;
+        }
+    });
+</script>
+{% endblock %}
