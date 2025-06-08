@@ -89,6 +89,35 @@
                 </div>
             </div>
 
+            <!-- matriks kebingungan -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Evaluasi Model
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Model Accuracy</h6>
+                            <div class="alert alert-info">
+                                <strong>{{ result.evaluation.accuracy }}</strong>
+                            </div>
+                            <p class="text-muted small">
+                                Akurasi model KNN berdasarkan data testing
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Confusion Matrix</h6>
+                            <div class="text-center">
+                                <img src="data:image/png;base64,{{ result.evaluation.confusion_matrix_plot }}" 
+                                    alt="Confusion Matrix" class="img-fluid" style="max-width: 100%; height: auto;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- navigasi tambahan -->
             <div class="text-center">
                 <a href="{{ url_for('index') }}" class="btn btn-primary me-3">
