@@ -1,14 +1,17 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
-import pandas as pd
-import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
-from imblearn.pipeline import make_pipeline
 from collections import Counter
-import pickle
-import os
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
+import pandas as pd
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # untuk server environment
+import matplotlib.pyplot as plt
+import seaborn as sns
+import base64
+from io import BytesIO
 
 app = Flask(__name__)
 
@@ -123,11 +126,26 @@ def setup_model():
     k_value = 5
     knn = KNNClassifier(k=k_value)
     knn.fit(X_train_processed.values, y_train_processed.values)
+
+    # vealusai model
+    y_prediction, _, _ = knn.predict(X_test.values)
+
+    # hitung matriks evaluasi
+    cm = confusion_matrix(y_test, y_prediction)
+    accuracy = accuracy_score(y_test, y_prediction)
+    report = classification_report(y_test, y_prediction, output_dict=True)
+
+    #simpan hasil evaluasi
+    evaluation_matrix = {
+        'confusion_matrix': cm.tolist(),
+        'accuracy': accuracy,
+        'classification_report': report
+    }
     
-    return knn, scaler, data, feature_cols
+    return knn, scaler, data, feature_cols, evaluation_matrix 
 
 #initialize model dan scaler
-MODEL, SCALER, ORIGINAL_DATA, FEATURE_COLS = setup_model()
+MODEL, SCALER, ORIGINAL_DATA, FEATURE_COLS, EVALUTION_MATRIX = setup_model()
 
 # ========== INPUT DATA USER ==========
 def format_currency(amount):
@@ -153,6 +171,25 @@ def preprocess_input(tempat_tinggal, pekerjaan, penghasilan, tanggungan, kendara
     input_data[cols_to_normalize] = SCALER.transform(input_data[cols_to_normalize])
     
     return input_data[FEATURE_COLS].values[0]
+
+def genarate_confusion_matrix():
+    cm =EVALUTION_MATRIX['confusion_matrix']
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Tidak Layak', 'Layak'], yticklabels=['Tidak Layak', 'Layak'])
+    plt.title('Confusion Matrix')
+    plt.xlabel('Predicted Label')
+    plt.ylabel('True Label')
+
+    #simpan plot ke dalam buffer
+    buffer = BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    plot_data = buffer.getvalue()
+    buffer.close()
+    plt.close()
+
+    return base64.b64encode(plot_data).decode('utf-8')
+
 
 # ========== ROUTES ==========
 # tampilan awal/home
@@ -200,6 +237,9 @@ def predict():
         prediction = predictions[0]
         confidence = confidences[0]
         k_nearest = details[0]['k_nearest_neighbors']
+
+        # genareta confusion matrix
+        cm_plot = genarate_confusion_matrix()
         
         #hasil
         result = {
@@ -222,6 +262,10 @@ def predict():
                 }
                 for dist, label in k_nearest
             ],
+            'evaluation': {
+                'accuracy': f"{EVALUTION_MATRIX['accuracy'] * 100:.1f}%",
+                'confusion_matrix_plot': cm_plot
+            }
         }
         
         return render_template('result.html', result=result)
