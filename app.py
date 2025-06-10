@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import base64
 from io import BytesIO
+# from pyngrok import ngrok
 
 app = Flask(__name__)
 
@@ -89,7 +90,7 @@ def categorize_job(job):
 
 def preprocess_data():
     # membaca dataset
-    data = pd.read_csv("C:/Users/mbak/Documents/GitHub/algoritma-knn-kelayakan-ukt/klasifikasimhs_dataset.csv")
+    data = pd.read_csv("klasifikasimhs_dataset.csv")
     
     # proses normalisasi (normalisasi data dan one hot encoding)
     data_normalized = data.copy()
@@ -284,4 +285,8 @@ def api_stats():
     return jsonify(stats)
 
 if __name__ == '__main__':
+    # # buka tunnel di port 5000
+    # public_url = ngrok.connect(5000)
+    # print("Public URL:", public_url)
+
     app.run(debug=True)
